@@ -1,0 +1,10 @@
+[project]
+name = "portia-wemakedevs-hackathon"
+version = "0.1.0"
+description = "Portia SDK Python project for the WeMakeDevs Hackathon"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dotenv>=0.9.9",
+    "portia-sdk-python[all]>=0.7.0",
+]
