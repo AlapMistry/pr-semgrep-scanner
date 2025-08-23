@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR Semgrep Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #submit-btn {
+            background-color: #4CAF50;
+        }
+        #submit-btn:hover {
+            background-color: #45a049;
+        }
+        #reset-btn {
+            background-color: #f44336;
+        }
+        #reset-btn:hover {
+            background-color: #d32f2f;
+        }
+        #chat {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 300px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 2s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Style for disabled inputs */
+        input:disabled, button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>PR Semgrep Scanner</h1>
+    <div class="container">
+        <div class="input-group">
+            <input type="text" id="repo-name" placeholder="Enter GitHub repository (user/reponame)..." required>
+            <input type="number" id="pr-number" placeholder="Enter PR number..." min="1" required>
+            <button id="submit-btn">Scan PR</button>
+            <button id="reset-btn" type="button">Reset</button>
+        </div>
+        <div class="loader">
+            <div class="spinner"></div> Processing...
+        </div>
+        <div id="chat"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const repoNameInput = document.getElementById('repo-name');
+            const prNumberInput = document.getElementById('pr-number');
+            const submitBtn = document.getElementById('submit-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const chatContainer = document.getElementById('chat');
+            const loader = document.querySelector('.loader');
+
+            // Prevent non-numeric input in PR number field
+            prNumberInput.addEventListener('input', function() {
+                // Remove any non-digit characters
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+            
+            // Reset button functionality
+            resetBtn.addEventListener('click', function() {
+                repoNameInput.value = '';
+                prNumberInput.value = '';
+                chatContainer.textContent = '';
+                repoNameInput.focus();
+            });
+            
+            submitBtn.addEventListener('click', async function() {
+                const repoName = repoNameInput.value.trim();
+                const prNumber = prNumberInput.value.trim();
+                
+                // Validate repository name format
+                if (!repoName) {
+                    alert('Please enter a GitHub repository name');
+                    return;
+                }
+                
+                if (!/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(repoName)) {
+                    alert('Please enter a valid GitHub repository name in the format "user/reponame"');
+                    return;
+                }
+                
+                if (!prNumber) {
+                    alert('Please enter a PR number');
+                    return;
+                }
+                
+                // Validate that PR number is a positive integer
+                if (!/^\d+$/.test(prNumber) || parseInt(prNumber) <= 0) {
+                    alert('Please enter a valid PR number (positive integer)');
+                    return;
+                }
+
+                // Clear previous chat
+                chatContainer.textContent = '';
+                loader.style.display = 'block';
+                
+                // Disable all inputs and buttons
+                submitBtn.disabled = true;
+                resetBtn.disabled = true;
+                repoNameInput.disabled = true;
+                prNumberInput.disabled = true;
+                
+                try {
+                    const response = await fetch('/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            messages: [
+                                { role: "system", content: "Scan PR" },
+                                { role: "user", content: JSON.stringify({
+                                    repository: repoName,
+                                    prNumber: prNumber
+                                }) }
+                            ]
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    // Use a TextDecoderStream for better streaming
+                    const decoder = new TextDecoderStream();
+                    const readableStream = response.body.pipeThrough(decoder);
+                    const reader = readableStream.getReader();
+                    
+                    // Create a loading indicator that updates
+                    const loadingIndicator = document.createElement('div');
+                    loadingIndicator.className = 'loading-indicator';
+                    loadingIndicator.textContent = '⏳ Processing...';
+                    chatContainer.appendChild(loadingIndicator);
+                    
+                    // Process the stream
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        
+                        if (done) {
+                            // Remove loading indicator when done
+                            if (loadingIndicator.parentNode) {
+                                loadingIndicator.parentNode.removeChild(loadingIndicator);
+                            }
+                            break;
+                        }
+                        
+                        // Remove loading indicator once we start getting real content
+                        if (value && loadingIndicator.parentNode) {
+                            loadingIndicator.parentNode.removeChild(loadingIndicator);
+                        }
+                        
+                        // Append the new text as a separate element for better visibility
+                        if (value) {
+                            const textNode = document.createTextNode(value);
+                            chatContainer.appendChild(textNode);
+                        }
+                        
+                        // Scroll to the bottom of the chat container
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    }
+                } catch (error) {
+                    console.error("Stream error:", error);
+                    // Handle network errors more gracefully
+                    if (error.message === "network error" || error.message.includes("NetworkError")) {
+                        // This could happen if the server has already sent all data successfully
+                        // but the connection was closed naturally, so we don't necessarily show an error
+                        if (!chatContainer.textContent.includes("Analysis complete")) {
+                            chatContainer.textContent += `\n\nNote: The connection ended unexpectedly, but all available results are shown above.`;
+                        }
+                    } else {
+                        // For other errors, show the error message
+                        chatContainer.textContent += `\n\nError: ${error.message}`;
+                    }
+                } finally {
+                    loader.style.display = 'none';
+                    
+                    // Re-enable all inputs and buttons
+                    submitBtn.disabled = false;
+                    resetBtn.disabled = false;
+                    repoNameInput.disabled = false;
+                    prNumberInput.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

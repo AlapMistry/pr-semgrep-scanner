@@ -6,5 +6,8 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "dotenv>=0.9.9",
+    "hypercorn>=0.17.3",
     "portia-sdk-python[all]>=0.7.0",
+    "quart>=0.20.0",
+    "requests>=2.32.5",
 ]
