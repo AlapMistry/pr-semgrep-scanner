@@ -16,7 +16,7 @@ This project demonstrates the use of Portia SDK Python to create an intelligent 
 - **GitHub Integration**: Fetches PR details and code diffs
 - **Security Scanning**: Uses Semgrep to find security vulnerabilities
 - **Real-time Analysis**: Streams results as they become available
-- **Plan Persistence**: Stores execution plans for future reference and analysis
+- **Plan Persistence**: Stores execution plans for future reference and analysis if development mode enabled
 
 ## Setup
 
@@ -83,7 +83,7 @@ The application will be available at http://localhost:4000 by default. You can c
    - Run Semgrep scan on the code changes
    - Perform a security check for potential vulnerabilities
 4. Results are streamed back to the web UI in real-time as they become available
-5. Plan execution details are stored in the `demo_runs` directory
+5. Plan execution details are stored in the `demo_runs` directory if development mode is enabled
 
 ## Tools Used
 
@@ -92,14 +92,13 @@ The application will be available at http://localhost:4000 by default. You can c
 - **Semgrep**: Static analysis tool for finding security vulnerabilities
 - **Quart**: Asynchronous web framework for Python
 - **Hypercorn**: ASGI server for running the web application
-- **python-dotenv**: For environment variable management
 
 ## Portia Features Demonstrated
 
 - Plan creation and execution
 - Tool integration (GitHub, Semgrep)
 - Streaming results from AI agent to web UI
-- Storage of plan runs for later analysis (in `demo_runs` directory)
+- Storage of plan runs for later analysis (in `demo_runs` directory if development mode enabled)
 - Multi-step reasoning for complex security analysis tasks
 - Error handling and graceful degradation
 
@@ -121,7 +120,7 @@ The application will be available at http://localhost:4000 by default. You can c
 - Add authentication for the web interface
 - Add support for custom Semgrep rules
 - Support for scanning private repositories
-- Run agent from GitHub Copilot chat as extension as stream response in a real time
+- Run agent from GitHub Copilot chat as extension and stream response in a real time
 
 ## Resources
 
