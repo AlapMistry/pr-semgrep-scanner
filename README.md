@@ -22,9 +22,10 @@ This project demonstrates the use of Portia SDK Python to create an intelligent 
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- Portia API key
-- GitHub access (for PR analysis)
+- Python 3.13 or higher
+- Portia API key (For .env file)
+- GitHub Personal Access Token with read access of contents and pull requests
+- GitHub MCP and Semgrep MCP enabled in Portia
 
 ### Installation
 
@@ -75,6 +76,11 @@ The application will be available at http://localhost:4000 by default. You can c
 - Storage of plan runs for later analysis (in `demo_runs` directory)
 - Multi-step reasoning for complex security analysis tasks
 - Error handling and graceful degradation
+
+## Portia Tools Used
+
+- GitHub MCP
+- Semgrep MCP
 
 ## Technical Implementation
 
