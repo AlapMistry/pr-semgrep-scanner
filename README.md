@@ -127,6 +127,6 @@ The application will be available at http://localhost:4000 by default. You can c
 
 - [Portia SDK Python Documentation](https://docs.portialabs.ai/)
 - [Google AI Studio](https://aistudio.google.com/)
-- [Semgrep Documentation](https://semgrep.dev/docs/)
-- [GitHub API Documentation](https://docs.github.com/en/rest)
+- [GitHub MCP Server Documentation](https://github.com/github/github-mcp-server)
+- [Semgrep MCP Server Documentation](https://github.com/semgrep/mcp)
 - [Quart Documentation](https://pgjones.gitlab.io/quart/)
