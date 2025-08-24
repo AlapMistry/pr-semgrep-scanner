@@ -23,7 +23,8 @@ This project demonstrates the use of Portia SDK Python to create an intelligent 
 ### Prerequisites
 
 - Python 3.13 or higher
-- Portia API key (For .env file)
+- Portia API key
+- Google API Key for Google AI Studio
 - GitHub Personal Access Token with read access of contents and pull requests
 - GitHub MCP and Semgrep MCP enabled in Portia
 
@@ -34,19 +35,43 @@ This project demonstrates the use of Portia SDK Python to create an intelligent 
    ```
    pip install -r requirements.txt
    ```
-3. Create a `.env` file with the following variables:
+3. Create a `.env` file with the following variables (see `.env.example` for a template):
    ```
+   PORT=4000
+   DEVELOPMENT=True
    PORTIA_API_KEY=your-portia-api-key
+   GOOGLE_API_KEY=your-google-api-key
    ```
 
 ### Running the Application
+
+#### Option 1: Direct Python Execution
 
 Run the application with:
 ```
 python start_server.py
 ```
 
-The application will be available at http://localhost:4000 by default. You can change the port by setting the `PORT` environment variable.
+#### Option 2: Using Docker
+
+The application is containerized and can be run with Docker:
+
+1. Build and start the container:
+```
+docker-compose up -d
+```
+
+2. View logs:
+```
+docker-compose logs -f
+```
+
+3. Stop the container:
+```
+docker-compose down
+```
+
+The application will be available at http://localhost:4000 by default. You can change the port by setting the `PORT` environment variable in your .env file.
 
 ## How it Works
 
@@ -63,6 +88,7 @@ The application will be available at http://localhost:4000 by default. You can c
 ## Tools Used
 
 - **Portia AI**: Framework for creating transparent, steerable AI agents
+- **Google AI Studio**: To use Google AI models using Google API key
 - **Semgrep**: Static analysis tool for finding security vulnerabilities
 - **Quart**: Asynchronous web framework for Python
 - **Hypercorn**: ASGI server for running the web application
@@ -100,6 +126,7 @@ The application will be available at http://localhost:4000 by default. You can c
 ## Resources
 
 - [Portia SDK Python Documentation](https://docs.portialabs.ai/)
+- [Google AI Studio](https://aistudio.google.com/)
 - [Semgrep Documentation](https://semgrep.dev/docs/)
 - [GitHub API Documentation](https://docs.github.com/en/rest)
 - [Quart Documentation](https://pgjones.gitlab.io/quart/)

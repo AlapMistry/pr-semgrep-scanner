@@ -1,7 +1,7 @@
 [project]
-name = "portia-wemakedevs-hackathon"
+name = "pr-semgrep-scanner"
 version = "0.1.0"
-description = "Portia SDK Python project for the WeMakeDevs Hackathon"
+description = "PR Semgrep Scanner using Portia SDK Python"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

@@ -8,6 +8,7 @@ from portia import (
     StorageClass,
     PortiaToolRegistry,
     LogLevel,
+    LLMProvider,
 )
 from portia.cli import CLIExecutionHooks
 
@@ -53,18 +54,29 @@ def run_portia(repository, pull_request_id):
         yield "Please check your network connection and API credentials."
 
 def create_portia_config():
-    # Create a Portia config with better logging and disk storage
-    api_key = os.getenv('PORTIA_API_KEY')
-    if not api_key:
+    storage_class = StorageClass.DISK
+    storage_dir = 'demo_runs'
+    DEVELOPMENT_MODE = os.getenv('DEVELOPMENT_MODE')
+    if not DEVELOPMENT_MODE:
+        storage_class = StorageClass.CLOUD
+        storage_dir=None
+
+    PORTIA_API_KEY = os.getenv('PORTIA_API_KEY')
+    if not PORTIA_API_KEY:
         print("Warning: PORTIA_API_KEY not set in environment variables")
-    
+
+    GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
     config = Config.from_default(
-        default_log_level=LogLevel.INFO,  # Enable INFO level logging
-        storage_class=StorageClass.DISK,   # Store plan runs on disk
-        storage_dir='demo_runs',           # Directory to store plan runs
-        api_key=api_key,                   # Use Portia cloud if API key is provided
-        request_timeout=60,                # Increase timeout for network requests
+        llm_provider=LLMProvider.GOOGLE,
+        default_model="google/gemini-2.0-flash",
+        google_api_key=GOOGLE_API_KEY,
+        default_log_level=LogLevel.INFO,
+        storage_class=storage_class,
+        storage_dir=storage_dir,
+        api_key=PORTIA_API_KEY,
+        request_timeout=60,
     )
+
     return config
 
 def create_tool_registry(config):

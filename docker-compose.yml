@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    image: alapmistry/pr-semgrep-scanner:1.0.0
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    volumes:
+      - ./demo_runs:/app/demo_runs
+    restart: unless-stopped
